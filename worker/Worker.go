@@ -31,6 +31,8 @@ func getWorker(iConfig object.IConfigData) (IWorker, error) {
 	switch reflect.TypeOf(iConfig).String() {
 	case "*object.IntConfigData":
 		return &intWorker{iConfig.(*object.IntConfigData)}, nil
+	case "*object.CrmDzXfTestConfigData":
+		return &crmDzXfTestWorker{iConfig.(*object.CrmDzXfTestConfigData)}, nil
 	default:
 		return nil, errors.New("未预知的配置类型")
 	}
@@ -40,8 +42,14 @@ func (w *worker) Run() {
 	msg, hisData := w.iWorker.GetMsg()
 	defer func() {
 		if hisData != nil {
-			err := w.iWorker.SaveSearchResult(hisData)
+			rep, err := w.iWorker.getHisRepository()
 			if err != nil {
+				log.Error(err.Error())
+				w.sendMsg(w.iConfig.GetConfigId(), err.Error())
+			}
+			err = rep.SetHis(hisData)
+			if err != nil {
+				log.Error(err.Error())
 				w.sendMsg(w.iConfig.GetConfigId(), err.Error())
 			}
 		}
@@ -71,6 +79,14 @@ func (w *worker) sendMsg(configId, msg string) {
 		log.Warn(fmt.Sprintf("消息未发送：%s", msg))
 	}
 }
+
+//func (w *worker) saveSearchResult(data object.IHisData) error {
+//	rep,err := repository.NewHisRepository(global.HCrmDzXfTest)
+//	if err != nil {
+//		return err
+//	}
+//	return rep.SetHis(data)
+//}
 
 func (w *worker) getNotifyList(id string) ([]notify.INotify, error) {
 	nl := repository.NotifyList{}

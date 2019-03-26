@@ -31,6 +31,12 @@ func NewTask(configType global.ConfigType) (*task, error) {
 		}, nil
 	case global.CIntD:
 		return nil, errors.New(fmt.Sprintf("无效的ConfigType：%d", configType))
+	case global.CCrmDzXfTest:
+		return &task{
+			iTask: &crmDzXfTestTask{},
+			cType: global.CCrmDzXfTest,
+			hType: global.HCrmDzXfTest,
+		}, nil
 	default:
 		return nil, errors.New(fmt.Sprintf("未预知的ConfigType：%d", configType))
 	}

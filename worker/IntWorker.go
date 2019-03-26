@@ -17,26 +17,26 @@ import (
 )
 
 type intWorker struct {
-	intConfigData *object.IntConfigData
+	configData *object.IntConfigData
 }
 
 func (iw *intWorker) GetMsg() (string, object.IHisData) {
 	comm := common{}
-	if iw.intConfigData == nil {
-		msg := comm.getMsg(iw.intConfigData.FMsgTitle, "配置内容为空")
+	if iw.configData == nil {
+		msg := comm.getMsg(iw.configData.FMsgTitle, "配置内容为空")
 		msg = iw.formatMsg(msg)
 		return msg, iw.getHisData(0, msg)
 	}
 	num, err := iw.getCheckNum()
 	if err != nil {
-		msg := comm.getMsg(iw.intConfigData.FMsgTitle, "获取数量时遇到错误")
+		msg := comm.getMsg(iw.configData.FMsgTitle, "获取数量时遇到错误")
 		msg = iw.formatMsg(msg)
 		return msg, iw.getHisData(0, msg)
 	}
 	var msg string
-	if num >= iw.intConfigData.FCheckMax || num <= iw.intConfigData.FCheckMin {
-		msg = comm.getMsg(iw.intConfigData.FMsgTitle,
-			strings.Replace(iw.intConfigData.FMsgContent, "title", strconv.Itoa(num), -1))
+	if num >= iw.configData.FCheckMax || num <= iw.configData.FCheckMin {
+		msg = comm.getMsg(iw.configData.FMsgTitle,
+			strings.Replace(iw.configData.FMsgContent, "title", strconv.Itoa(num), -1))
 		dMsg := iw.getDMsg()
 		if msg != "" {
 			if dMsg != "" {
@@ -53,7 +53,7 @@ func (iw *intWorker) GetMsg() (string, object.IHisData) {
 func (iw *intWorker) getHisData(num int, msg string) object.IHisData {
 	return &object.IntHisData{
 		FId:       strings.ToUpper(goToolCommon.Guid()),
-		FConfigId: iw.intConfigData.FId,
+		FConfigId: iw.configData.FId,
 		FNum:      num,
 		FContent:  msg,
 		FOprTime:  time.Now(),
@@ -73,9 +73,9 @@ func (iw *intWorker) getDMsg() string {
 		log.Error(fmt.Sprintf(err.Error()))
 		return ""
 	}
-	dConfig, err := rep.GetConfig(iw.intConfigData.FId)
+	dConfig, err := rep.GetConfig(iw.configData.FId)
 	if err != nil {
-		log.Error(fmt.Sprintf("获取明细配置时遇到错误：%s，查询ID为：%s", err.Error(), iw.intConfigData.FId))
+		log.Error(fmt.Sprintf("获取明细配置时遇到错误：%s，查询ID为：%s", err.Error(), iw.configData.FId))
 		return ""
 	}
 	//无明细配置
@@ -147,40 +147,45 @@ func (iw *intWorker) getSingleDMsg(search string) string {
 	return result
 }
 
-func (iw *intWorker) SaveSearchResult(data object.IHisData) error {
-	switch reflect.TypeOf(data).String() {
-	case "*object.IntHisData":
-		rep, err := repository.NewHisRepository(global.HInt)
-		if err != nil {
-			return err
-		}
-		iHisData, ok := data.(*object.IntHisData)
-		if ok {
-			err := rep.SetHis(iHisData)
-			if err != nil {
-				s, _ := goToolCommon.GetJsonStr(data)
-				errMsg := fmt.Sprintf("保存查询结果时遇到错误：%s，待保存内容：%s", err.Error(), s)
-				log.Error(errMsg)
-				return errors.New(errMsg)
-			}
-			return nil
-		} else {
-			s, _ := goToolCommon.GetJsonStr(data)
-			errMsg := fmt.Sprintf("强制类型转换失败[IntHisData]，待保存内容：%s", s)
-			log.Error(errMsg)
-			return errors.New(errMsg)
-		}
-	default:
-		s, _ := goToolCommon.GetJsonStr(data)
-		errMsg := fmt.Sprintf("历史数据类型异常，exp：IntHisData，待保存内容：%s", s)
-		log.Error(errMsg)
-		return errors.New(errMsg)
-	}
+func (iw *intWorker) getHisRepository() (repository.IHisRepository, error) {
+	return repository.NewHisRepository(global.HInt)
 }
+
+//
+//func (iw *intWorker) SaveSearchResult(data object.IHisData) error {
+//	switch reflect.TypeOf(data).String() {
+//	case "*object.IntHisData":
+//		rep, err := repository.NewHisRepository(global.HInt)
+//		if err != nil {
+//			return err
+//		}
+//		iHisData, ok := data.(*object.IntHisData)
+//		if ok {
+//			err := rep.SetHis(iHisData)
+//			if err != nil {
+//				s, _ := goToolCommon.GetJsonStr(data)
+//				errMsg := fmt.Sprintf("保存查询结果时遇到错误：%s，待保存内容：%s", err.Error(), s)
+//				log.Error(errMsg)
+//				return errors.New(errMsg)
+//			}
+//			return nil
+//		} else {
+//			s, _ := goToolCommon.GetJsonStr(data)
+//			errMsg := fmt.Sprintf("强制类型转换失败[IntHisData]，待保存内容：%s", s)
+//			log.Error(errMsg)
+//			return errors.New(errMsg)
+//		}
+//	default:
+//		s, _ := goToolCommon.GetJsonStr(data)
+//		errMsg := fmt.Sprintf("历史数据类型异常，exp：IntHisData，待保存内容：%s", s)
+//		log.Error(errMsg)
+//		return errors.New(errMsg)
+//	}
+//}
 
 //获取待检测值
 func (iw *intWorker) getCheckNum() (int, error) {
-	rows, err := iw.getRowsBySQL(iw.intConfigData.FSearch)
+	rows, err := iw.getRowsBySQL(iw.configData.FSearch)
 	if err != nil {
 		return 0, err
 	}
@@ -227,10 +232,10 @@ func (iw *intWorker) getRowsBySQL(sql string) (*sql.Rows, error) {
 //获取DB配置
 func (iw *intWorker) getDBConfig() *goToolMSSql.MSSqlConfig {
 	return &goToolMSSql.MSSqlConfig{
-		Server: iw.intConfigData.FServer,
-		Port:   iw.intConfigData.FPort,
-		DbName: iw.intConfigData.FDbName,
-		User:   iw.intConfigData.FDbUser,
-		Pwd:    iw.intConfigData.FDbPwd,
+		Server: iw.configData.FServer,
+		Port:   iw.configData.FPort,
+		DbName: iw.configData.FDbName,
+		User:   iw.configData.FDbUser,
+		Pwd:    iw.configData.FDbPwd,
 	}
 }

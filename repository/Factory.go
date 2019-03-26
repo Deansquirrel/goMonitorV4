@@ -1,9 +1,9 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Deansquirrel/goMonitorV4/global"
-	"github.com/kataras/iris/core/errors"
 )
 
 func NewConfigRepository(configType global.ConfigType) (IConfigRepository, error) {
@@ -20,6 +20,10 @@ func NewConfigRepository(configType global.ConfigType) (IConfigRepository, error
 		return &configRepository{
 			Config: &intDConfig{},
 		}, nil
+	case global.CCrmDzXfTest:
+		return &configRepository{
+			Config: &crmDzXfTestConfig{},
+		}, nil
 	default:
 		return nil, errors.New(fmt.Sprintf("未预知的ConfigType：%d", configType))
 	}
@@ -30,6 +34,10 @@ func NewHisRepository(hisType global.HisType) (IHisRepository, error) {
 	case global.HInt:
 		return &hisRepository{
 			His: &intHis{},
+		}, nil
+	case global.HCrmDzXfTest:
+		return &hisRepository{
+			His: &crmDzXfTestHis{},
 		}, nil
 	default:
 		return nil, errors.New(fmt.Sprintf("hisType：%d", hisType))

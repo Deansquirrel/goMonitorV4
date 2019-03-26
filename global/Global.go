@@ -23,6 +23,7 @@ const (
 	CM ConfigType = iota
 	CInt
 	CIntD
+	CCrmDzXfTest
 )
 
 type NotifyType int
@@ -35,6 +36,7 @@ type HisType int
 
 const (
 	HInt HisType = iota
+	HCrmDzXfTest
 )
 
 var SysConfig *config.SysConfig

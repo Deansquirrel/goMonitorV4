@@ -37,6 +37,16 @@ func main() {
 		}
 	}
 
+	crmDzXfTestTask, err := taskService.NewTask(global.CCrmDzXfTest)
+	if err != nil {
+		log.Debug(err.Error())
+	} else {
+		err = crmDzXfTestTask.StartTask()
+		if err != nil {
+			log.Debug(err.Error())
+		}
+	}
+
 	select {
 	case <-global.Ctx.Done():
 	}
