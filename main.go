@@ -27,9 +27,14 @@ func main() {
 	}
 	global.Ctx, global.Cancel = context.WithCancel(context.Background())
 
-	err = taskService.NewIntTask().StartTask()
+	intTask, err := taskService.NewTask(global.CInt)
 	if err != nil {
 		log.Debug(err.Error())
+	} else {
+		err = intTask.StartTask()
+		if err != nil {
+			log.Debug(err.Error())
+		}
 	}
 
 	select {

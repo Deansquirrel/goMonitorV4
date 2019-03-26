@@ -19,17 +19,29 @@ type task struct {
 	hType global.HisType
 }
 
-func newTask(iTask ITask, cType global.ConfigType, hType global.HisType) *task {
-	return &task{
-		iTask: iTask,
-		cType: cType,
-		hType: hType,
+func NewTask(configType global.ConfigType) (*task, error) {
+	switch configType {
+	case global.CM:
+		return nil, errors.New(fmt.Sprintf("无效的ConfigType：%d", configType))
+	case global.CInt:
+		return &task{
+			iTask: &intTask{},
+			cType: global.CInt,
+			hType: global.HInt,
+		}, nil
+	case global.CIntD:
+		return nil, errors.New(fmt.Sprintf("无效的ConfigType：%d", configType))
+	default:
+		return nil, errors.New(fmt.Sprintf("未预知的ConfigType：%d", configType))
 	}
 }
 
 func (t *task) StartTask() error {
 	var rep repository.IConfigRepository
-	rep = repository.NewIntConfigRepository()
+	rep, err := repository.NewConfigRepository(t.cType)
+	if err != nil {
+		return err
+	}
 	//获取配置列表
 	list, err := rep.GetConfigList()
 	if err != nil {
@@ -175,13 +187,9 @@ func (t *task) delHisData() {
 
 func (t *task) refreshConfigWorker() error {
 	var rep repository.IConfigRepository
-	switch t.cType {
-	case global.CInt:
-		rep = repository.NewIntConfigRepository()
-	default:
-		errMsg := "未预知的cType"
-		log.Error(errMsg)
-		return errors.New(errMsg)
+	rep, err := repository.NewConfigRepository(t.cType)
+	if err != nil {
+		return err
 	}
 	//获取配置列表
 	list, err := rep.GetConfigList()

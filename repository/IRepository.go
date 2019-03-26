@@ -19,3 +19,7 @@ type IHisRepository interface {
 	SetHis(data object.IHisData) error
 	ClearHis(t time.Duration) error
 }
+
+type INotifyRepository interface {
+	GetNotify(id string) (object.INotifyData, error)
+}

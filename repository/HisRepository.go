@@ -12,13 +12,8 @@ type hisRepository struct {
 	His IHis
 }
 
-func newHisRepository(his IHis) *hisRepository {
-	return &hisRepository{
-		His: his,
-	}
-}
-
 func (hr *hisRepository) GetHisList() ([]object.IHisData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(hr.His.GetSqlHisList())
 	if err != nil {
 		log.Error(err.Error())
@@ -28,6 +23,7 @@ func (hr *hisRepository) GetHisList() ([]object.IHisData, error) {
 }
 
 func (hr *hisRepository) GetHisById(id string) (object.IHisData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(hr.His.GetSqlHisById(), id)
 	if err != nil {
 		log.Error(err.Error())
@@ -37,6 +33,7 @@ func (hr *hisRepository) GetHisById(id string) (object.IHisData, error) {
 }
 
 func (hr *hisRepository) GetHisByConfigId(id string) ([]object.IHisData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(hr.His.GetSqlHisByConfigId(), id)
 	if err != nil {
 		log.Error(err.Error())
@@ -46,6 +43,7 @@ func (hr *hisRepository) GetHisByConfigId(id string) ([]object.IHisData, error) 
 }
 
 func (hr *hisRepository) GetHisByTime(begTime, endTime time.Time) ([]object.IHisData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(hr.His.GetSqlHisByTime(), begTime, endTime)
 	if err != nil {
 		log.Error(err.Error())
@@ -59,6 +57,7 @@ func (hr *hisRepository) SetHis(data object.IHisData) error {
 	if err != nil {
 		return err
 	}
+	comm := common{}
 	err = comm.setRowsBySQL(hr.His.GetSqlSetHis(), args...)
 	if err != nil {
 		log.Error(err.Error())
@@ -69,6 +68,7 @@ func (hr *hisRepository) SetHis(data object.IHisData) error {
 
 func (hr *hisRepository) ClearHis(t time.Duration) error {
 	dateP := goToolCommon.GetDateTimeStr(time.Now().Add(-t))
+	comm := common{}
 	err := comm.setRowsBySQL(hr.His.GetSqlClearHis(), dateP)
 	if err != nil {
 		log.Error(err.Error())

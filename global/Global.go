@@ -20,20 +20,15 @@ const (
 type ConfigType int
 
 const (
-	CMConfig ConfigType = iota
+	CM ConfigType = iota
 	CInt
+	CIntD
 )
 
 type NotifyType int
 
 const (
 	NDingTalkRobot NotifyType = iota
-)
-
-type WorkerType int
-
-const (
-	WInt WorkerType = iota
 )
 
 type HisType int

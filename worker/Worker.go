@@ -1,12 +1,13 @@
 package worker
 
 import (
+	"errors"
 	"fmt"
+	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/notify"
 	"github.com/Deansquirrel/goMonitorV4/object"
 	"github.com/Deansquirrel/goMonitorV4/repository"
 	log "github.com/Deansquirrel/goToolLog"
-	"github.com/kataras/iris/core/errors"
 	"reflect"
 )
 
@@ -29,12 +30,7 @@ func NewWorker(iConfig object.IConfigData) (*worker, error) {
 func getWorker(iConfig object.IConfigData) (IWorker, error) {
 	switch reflect.TypeOf(iConfig).String() {
 	case "*object.IntConfigData":
-		config, ok := iConfig.(*object.IntConfigData)
-		if ok {
-			return newIntWorker(config), nil
-		} else {
-			return nil, errors.New("强制类型转换失败[IntConfigData]")
-		}
+		return &intWorker{iConfig.(*object.IntConfigData)}, nil
 	default:
 		return nil, errors.New("未预知的配置类型")
 	}
@@ -88,18 +84,21 @@ func (w *worker) getNotifyList(id string) ([]notify.INotify, error) {
 	result := make([]notify.INotify, 0)
 
 	errMsg := ""
-	errMsgFormat := "获取[%s]NotifyData时发生错误：%s；"
 
 	//获取DingTalkRobot类型配置数据
-	dingTalkRep := repository.NewDingTalkRobotRepository()
+	dingTalkRep, err := repository.NewNotifyRepository(global.NDingTalkRobot)
+	if err != nil {
+		return nil, err
+	}
 	for _, id := range d.DingTalkRobot {
 		n, err := dingTalkRep.GetNotify(id)
 		if err != nil {
-			m := fmt.Sprintf(errMsgFormat, "DingTalkRobot", err.Error())
-			log.Error(m)
-			errMsg = errMsg + m
+			errMsg = w.updateNotifyErr(errMsg, err)
 		} else {
-			dt := notify.NewDingTalkRobot(n.(*object.DingTalkRobotNotifyData))
+			dt, err := notify.NewNotify(n.(*object.DingTalkRobotNotifyData))
+			if err != nil {
+				errMsg = w.updateNotifyErr(errMsg, err)
+			}
 			result = append(result, dt)
 		}
 	}
@@ -111,4 +110,11 @@ func (w *worker) getNotifyList(id string) ([]notify.INotify, error) {
 	}
 
 	return result, err
+}
+
+func (w *worker) updateNotifyErr(old string, err error) string {
+	errMsgFormat := "获取[%s]NotifyData时发生错误：%s；"
+	m := fmt.Sprintf(errMsgFormat, "DingTalkRobot", err.Error())
+	log.Error(m)
+	return old + m
 }

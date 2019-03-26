@@ -7,12 +7,6 @@ import (
 	"github.com/Deansquirrel/goToolMSSql"
 )
 
-var comm common
-
-func init() {
-	comm = common{}
-}
-
 type common struct {
 }
 

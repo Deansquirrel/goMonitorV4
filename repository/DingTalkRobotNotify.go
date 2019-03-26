@@ -24,14 +24,14 @@ const SqlGetDingTalkRobotById = "" +
 //	" INNER JOIN [DingTalkRobot] B ON A.[FId] = B.[FId]" +
 //	" WHERE A.[FId] in (%s)"
 
-type dingTalkRobotConfig struct {
+type dingTalkRobotNotify struct {
 }
 
-func (config *dingTalkRobotConfig) GetSqlGetConfig() string {
+func (config *dingTalkRobotNotify) GetSqlGetConfig() string {
 	return SqlGetDingTalkRobotById
 }
 
-func (config *dingTalkRobotConfig) getConfigListByRows(rows *sql.Rows) ([]object.INotifyData, error) {
+func (config *dingTalkRobotNotify) getConfigListByRows(rows *sql.Rows) ([]object.INotifyData, error) {
 	defer func() {
 		_ = rows.Close()
 	}()

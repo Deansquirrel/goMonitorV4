@@ -20,6 +20,7 @@ type NotifyListData struct {
 }
 
 func (nc *NotifyList) GetNotifyList(id string) (*NotifyListData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(SqlGetNotifyList, id)
 	if err != nil {
 		return nil, err

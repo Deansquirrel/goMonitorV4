@@ -11,13 +11,8 @@ type notifyRepository struct {
 	Notify INotify
 }
 
-func newNotifyRepository(notify INotify) *notifyRepository {
-	return &notifyRepository{
-		Notify: notify,
-	}
-}
-
 func (nr *notifyRepository) GetNotify(id string) (object.INotifyData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(nr.Notify.GetSqlGetConfig(), id)
 	if err != nil {
 		log.Error(err.Error())

@@ -11,13 +11,8 @@ type configRepository struct {
 	Config IConfig
 }
 
-func newConfigRepository(config IConfig) *configRepository {
-	return &configRepository{
-		Config: config,
-	}
-}
-
 func (cr *configRepository) GetConfigList() ([]object.IConfigData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(cr.Config.GetSqlGetConfigList())
 	if err != nil {
 		log.Error(err.Error())
@@ -27,6 +22,7 @@ func (cr *configRepository) GetConfigList() ([]object.IConfigData, error) {
 }
 
 func (cr *configRepository) GetConfig(id string) (object.IConfigData, error) {
+	comm := common{}
 	rows, err := comm.getRowsBySQL(cr.Config.GetSqlGetConfig(), id)
 	if err != nil {
 		log.Error(err.Error())

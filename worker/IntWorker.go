@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/object"
 	"github.com/Deansquirrel/goMonitorV4/repository"
 	"github.com/Deansquirrel/goToolCommon"
@@ -67,7 +68,11 @@ func (iw *intWorker) formatMsg(msg string) string {
 }
 
 func (iw *intWorker) getDMsg() string {
-	rep := repository.NewIntDConfigRepository()
+	rep, err := repository.NewConfigRepository(global.CIntD)
+	if err != nil {
+		log.Error(fmt.Sprintf(err.Error()))
+		return ""
+	}
 	dConfig, err := rep.GetConfig(iw.intConfigData.FId)
 	if err != nil {
 		log.Error(fmt.Sprintf("获取明细配置时遇到错误：%s，查询ID为：%s", err.Error(), iw.intConfigData.FId))
@@ -145,7 +150,10 @@ func (iw *intWorker) getSingleDMsg(search string) string {
 func (iw *intWorker) SaveSearchResult(data object.IHisData) error {
 	switch reflect.TypeOf(data).String() {
 	case "*object.IntHisData":
-		rep := repository.NewIntHisRepository()
+		rep, err := repository.NewHisRepository(global.HInt)
+		if err != nil {
+			return err
+		}
 		iHisData, ok := data.(*object.IntHisData)
 		if ok {
 			err := rep.SetHis(iHisData)
