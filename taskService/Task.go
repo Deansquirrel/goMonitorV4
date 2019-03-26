@@ -21,7 +21,7 @@ type task struct {
 
 func NewTask(configType global.ConfigType) (*task, error) {
 	switch configType {
-	case global.CM:
+	case global.CM, global.CIntD:
 		return nil, errors.New(fmt.Sprintf("无效的ConfigType：%d", configType))
 	case global.CInt:
 		return &task{
@@ -29,8 +29,6 @@ func NewTask(configType global.ConfigType) (*task, error) {
 			cType: global.CInt,
 			hType: global.HInt,
 		}, nil
-	case global.CIntD:
-		return nil, errors.New(fmt.Sprintf("无效的ConfigType：%d", configType))
 	case global.CCrmDzXfTest:
 		return &task{
 			iTask: &crmDzXfTestTask{},
