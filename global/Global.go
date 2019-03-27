@@ -23,6 +23,7 @@ const (
 	CM ConfigType = iota
 	CInt
 	CIntD
+	CHealth
 	CCrmDzXfTest
 )
 

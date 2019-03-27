@@ -20,6 +20,10 @@ func NewConfigRepository(configType global.ConfigType) (IConfigRepository, error
 		return &configRepository{
 			Config: &intDConfig{},
 		}, nil
+	case global.CHealth:
+		return &configRepository{
+			Config: &healthConfig{},
+		}, nil
 	case global.CCrmDzXfTest:
 		return &configRepository{
 			Config: &crmDzXfTestConfig{},
@@ -40,7 +44,7 @@ func NewHisRepository(hisType global.HisType) (IHisRepository, error) {
 			His: &crmDzXfTestHis{},
 		}, nil
 	default:
-		return nil, errors.New(fmt.Sprintf("hisType：%d", hisType))
+		return nil, errors.New(fmt.Sprintf("未预知的HisType：%d", hisType))
 	}
 }
 

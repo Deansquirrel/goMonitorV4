@@ -29,6 +29,11 @@ func NewTask(configType global.ConfigType) (*task, error) {
 			cType: global.CInt,
 			hType: global.HInt,
 		}, nil
+	case global.CHealth:
+		return &task{
+			iTask: &healthTask{},
+			cType: global.CHealth,
+		}, nil
 	case global.CCrmDzXfTest:
 		return &task{
 			iTask: &crmDzXfTestTask{},
@@ -175,15 +180,12 @@ func (t *task) refreshConfig() {
 //删除历史数据
 func (t *task) delHisData() {
 	d := time.Duration(1000 * 1000 * 1000 * 60 * 60 * 24 * global.SysConfig.TaskConfig.KeepDays)
-	var rep repository.IHisRepository
-	switch t.hType {
-	case global.HInt:
-		//rep = repository.NewIntHisRepository()
-	default:
-		log.Error("未预知的hType")
+	rep, err := repository.NewHisRepository(t.hType)
+	if err != nil {
+		log.Error(err.Error())
 		return
 	}
-	err := rep.ClearHis(d)
+	err = rep.ClearHis(d)
 	if err != nil {
 		log.Error("删除历史数据时遇到错误：" + err.Error())
 	}

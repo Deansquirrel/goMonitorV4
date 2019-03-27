@@ -33,8 +33,10 @@ func getWorker(iConfig object.IConfigData) (IWorker, error) {
 		return &intWorker{iConfig.(*object.IntConfigData)}, nil
 	case "*object.CrmDzXfTestConfigData":
 		return &crmDzXfTestWorker{iConfig.(*object.CrmDzXfTestConfigData)}, nil
+	case "*object.HealthConfigData":
+		return &healthWorker{iConfig.(*object.HealthConfigData)}, nil
 	default:
-		return nil, errors.New("未预知的配置类型")
+		return nil, errors.New("未预知的配置类型:" + reflect.TypeOf(iConfig).String())
 	}
 }
 

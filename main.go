@@ -47,6 +47,16 @@ func main() {
 		}
 	}
 
+	healthTask, err := taskService.NewTask(global.CHealth)
+	if err != nil {
+		log.Debug(err.Error())
+	} else {
+		err = healthTask.StartTask()
+		if err != nil {
+			log.Debug(err.Error())
+		}
+	}
+
 	select {
 	case <-global.Ctx.Done():
 	}
