@@ -11,6 +11,7 @@ import (
 	log "github.com/Deansquirrel/goToolLog"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -26,19 +27,20 @@ type dingTalkTextMsg struct {
 }
 
 func (dt *dingTalkRobot) SendMsg(msg string) error {
-	var err error
 	if dt.configData.FIsAtAll == 1 {
-		err = dt.sendTextMsgWithAtAll(dt.configData.FWebHookKey, msg)
-	} else if strings.Trim(dt.configData.FAtMobiles, " ") != "" {
+		return dt.sendTextMsgWithAtAll(dt.configData.FWebHookKey, msg)
+	}
+	if strings.Trim(dt.configData.FAtMobiles, " ") != "" {
 		list := strings.Split(strings.Trim(dt.configData.FAtMobiles, " "), ",")
 		list = goToolCommon.ClearBlock(list)
+		log.Debug(strconv.Itoa(len(list)))
 		if len(list) > 0 {
-			err = dt.sendTextMsgWithAtList(dt.configData.FWebHookKey, msg, list)
-		} else {
-			err = dt.sendTextMsg(dt.configData.FWebHookKey, msg)
+			log.Debug(dt.configData.FWebHookKey)
+			log.Debug(msg)
+			return dt.sendTextMsgWithAtList(dt.configData.FWebHookKey, msg, list)
 		}
 	}
-	return err
+	return dt.sendTextMsg(dt.configData.FWebHookKey, msg)
 }
 
 func (dt *dingTalkRobot) sendTextMsg(webHookKey string, msg string) error {
@@ -87,15 +89,16 @@ func (dt *dingTalkRobot) sendMsg(v interface{}) error {
 
 //POST发送数据
 func (dt *dingTalkRobot) sendData(data []byte, url string) ([]byte, error) {
-	log.Debug(string(data))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	if err != nil {
+		log.Error(err.Error())
 		return nil, errors.New("构造http请求数据时发生错误：" + err.Error())
 	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Error(err.Error())
 		return nil, errors.New("发送http请求时错误：" + err.Error())
 	}
 	defer func() {
@@ -103,6 +106,7 @@ func (dt *dingTalkRobot) sendData(data []byte, url string) ([]byte, error) {
 	}()
 	rData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Error(err.Error())
 		return nil, errors.New("读取http返回数据时发生错误：" + err.Error())
 	}
 	return rData, nil
