@@ -15,7 +15,7 @@ type healthWorker struct {
 
 func (hw *healthWorker) GetMsg() (string, object.IHisData) {
 	comm := common{}
-	if hw.configData != nil {
+	if hw.configData == nil {
 		msg := comm.getMsg("", "配置内容为空")
 		msg = hw.formatMsg(msg)
 		return msg, nil

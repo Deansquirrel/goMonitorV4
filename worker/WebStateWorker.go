@@ -25,10 +25,12 @@ func (wsw *webStateWorker) GetMsg() (string, object.IHisData) {
 	}
 	useTime, httpCode, err := wsw.getWebStateTestData()
 	if err != nil {
-		return wsw.formatMsg(comm.getMsg(wsw.configData.FMsgTitle, err.Error())), wsw.getHisData(useTime, httpCode, err.Error())
+		msg := comm.getMsg(wsw.configData.FMsgTitle, err.Error())
+		msg = wsw.formatMsg(msg)
+		return msg, wsw.getHisData(useTime, httpCode, msg)
 	}
 	var msg string
-	if httpCode != 200 || useTime > 5*1000 {
+	if httpCode != 200 {
 		msg = comm.getMsg(wsw.configData.FMsgTitle, wsw.configData.FMsgContent)
 		if msg != "" {
 			msg = msg + "\n"
@@ -36,6 +38,7 @@ func (wsw *webStateWorker) GetMsg() (string, object.IHisData) {
 		msg = msg + fmt.Sprintf("返回码：%d", httpCode)
 		msg = msg + "\n"
 		msg = msg + fmt.Sprintf("用时：%d", useTime)
+		msg = wsw.formatMsg(msg)
 	}
 	return msg, wsw.getHisData(useTime, httpCode, msg)
 }
@@ -56,27 +59,37 @@ func (wsw *webStateWorker) getWebStateTestData() (useTime, httpCode int, err err
 	ms := ns / 1000 / 1000
 	if err != nil {
 		log.Error(err.Error())
-		return -1, 0, err
 	}
-	return int(ms), code, nil
+	return int(ms), code, err
 }
 
 func (wsw *webStateWorker) getHttpCode() (int, error) {
-	req, err := http.NewRequest("GET", wsw.configData.FUrl, nil)
-	if err != nil {
-		return -1, err
+	//req, err := http.NewRequest("GET", wsw.configData.FUrl, nil)
+	//if err != nil {
+	//	return -1, err
+	//}
+	transport := http.Transport{
+		DisableKeepAlives: true,
 	}
 	client := &http.Client{
-		Timeout: time.Second * global.HttpConnectTimeout,
+		Timeout:   time.Second * global.HttpConnectTimeout,
+		Transport: &transport,
 	}
-	resp, err := client.Do(req)
+	resp, err := client.Get(wsw.configData.FUrl)
+
+	//resp, err := client.Do(req)
 	if err != nil {
 		return 0, err
 	}
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	return resp.StatusCode, nil
+	httpCode := resp.StatusCode
+	//_, err = ioutil.ReadAll(resp.Body)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//}
+	return httpCode, nil
 }
 
 func (wsw *webStateWorker) getHisData(useTime, httpCode int, msg string) object.IHisData {

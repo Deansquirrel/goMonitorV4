@@ -221,6 +221,7 @@ func (configData *WebStateConfigData) IsEqual(d IConfigData) bool {
 			return false
 		}
 		if configData.FId != c.FId ||
+			configData.FUrl != c.FUrl ||
 			configData.FCron != c.FCron ||
 			configData.FMsgTitle != c.FMsgTitle ||
 			configData.FMsgContent != c.FMsgContent {
