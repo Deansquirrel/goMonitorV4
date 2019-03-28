@@ -24,6 +24,7 @@ const (
 	CInt
 	CIntD
 	CHealth
+	CWebState
 	CCrmDzXfTest
 )
 
@@ -37,6 +38,7 @@ type HisType int
 
 const (
 	HInt HisType = iota
+	HWebState
 	HCrmDzXfTest
 )
 

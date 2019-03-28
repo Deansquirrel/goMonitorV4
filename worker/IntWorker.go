@@ -23,7 +23,7 @@ type intWorker struct {
 func (iw *intWorker) GetMsg() (string, object.IHisData) {
 	comm := common{}
 	if iw.configData == nil {
-		msg := comm.getMsg(iw.configData.FMsgTitle, "配置内容为空")
+		msg := comm.getMsg("", "配置内容为空")
 		msg = iw.formatMsg(msg)
 		return msg, iw.getHisData(0, msg)
 	}

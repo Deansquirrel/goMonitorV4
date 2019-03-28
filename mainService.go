@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/Deansquirrel/goMonitorV3/common"
-	"github.com/Deansquirrel/goMonitorV3/global"
-	myService "github.com/Deansquirrel/goMonitorV3/service"
+	"github.com/Deansquirrel/goMonitorV4/common"
+	"github.com/Deansquirrel/goMonitorV4/global"
+	myService "github.com/Deansquirrel/goMonitorV4/service"
 	log "github.com/Deansquirrel/goToolLog"
 	"github.com/kardianos/service"
 	"os"

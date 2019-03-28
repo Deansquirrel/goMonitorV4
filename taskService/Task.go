@@ -40,6 +40,12 @@ func NewTask(configType global.ConfigType) (*task, error) {
 			cType: global.CCrmDzXfTest,
 			hType: global.HCrmDzXfTest,
 		}, nil
+	case global.CWebState:
+		return &task{
+			iTask: &webStateTask{},
+			cType: global.CWebState,
+			hType: global.HWebState,
+		}, nil
 	default:
 		return nil, errors.New(fmt.Sprintf("未预知的ConfigType：%d", configType))
 	}

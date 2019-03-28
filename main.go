@@ -57,9 +57,18 @@ func main() {
 		}
 	}
 
+	webState, err := taskService.NewTask(global.CWebState)
+	if err != nil {
+		log.Debug(err.Error())
+	} else {
+		err = webState.StartTask()
+		if err != nil {
+			log.Debug(err.Error())
+		}
+	}
+
 	select {
 	case <-global.Ctx.Done():
 	}
-
 	//==================================================================================================================
 }

@@ -22,13 +22,15 @@ type crmDzXfTestWorker struct {
 func (cw *crmDzXfTestWorker) GetMsg() (string, object.IHisData) {
 	comm := common{}
 	if cw.configData == nil {
-		msg := comm.getMsg(cw.configData.FMsgTitle, "配置内容为空")
+		msg := comm.getMsg("", "配置内容为空")
 		msg = cw.formatMsg(msg)
 		return msg, cw.getHisData(-1, 0, msg)
 	}
 	useTime, httpCode, err := cw.getCrmDzXfTestTestData()
 	if err != nil {
-		return comm.getMsg(cw.configData.FMsgTitle, err.Error()), cw.getHisData(useTime, httpCode, err.Error())
+		msg := comm.getMsg(cw.configData.FMsgTitle, err.Error())
+		msg = cw.formatMsg(msg)
+		return msg, cw.getHisData(useTime, httpCode, err.Error())
 	}
 
 	var msg string
