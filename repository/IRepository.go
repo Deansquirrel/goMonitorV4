@@ -23,3 +23,7 @@ type IHisRepository interface {
 type INotifyRepository interface {
 	GetNotify(id string) (object.INotifyData, error)
 }
+
+type IActionRepository interface {
+	GetAction(id string) (object.IActionData, error)
+}

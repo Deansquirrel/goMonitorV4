@@ -62,6 +62,22 @@ func NewNotifyRepository(notifyType global.NotifyType) (INotifyRepository, error
 		return &notifyRepository{
 			Notify: &dingTalkRobotNotify{},
 		}, nil
+	default:
+		return nil, errors.New(fmt.Sprintf("未预知的NotifyType：%d", notifyType))
 	}
-	return nil, nil
+}
+
+func NewActionRepository(actionType global.ActionType) (IActionRepository, error) {
+	switch actionType {
+	case global.AWindowsService:
+		return &actionRepository{
+			Action: &windowsServiceAction{},
+		}, nil
+	case global.AIISAppPool:
+		return &actionRepository{
+			Action: &iisAppPoolAction{},
+		}, nil
+	default:
+		return nil, errors.New(fmt.Sprintf("未预知的actionType：%d", actionType))
+	}
 }

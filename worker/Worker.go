@@ -3,6 +3,7 @@ package worker
 import (
 	"errors"
 	"fmt"
+	"github.com/Deansquirrel/goMonitorV4/action"
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/notify"
 	"github.com/Deansquirrel/goMonitorV4/object"
@@ -44,26 +45,85 @@ func getWorker(iConfig object.IConfigData) (IWorker, error) {
 
 func (w *worker) Run() {
 	msg, hisData := w.iWorker.GetMsg()
-	defer func() {
-		if hisData != nil {
-			rep, err := w.iWorker.getHisRepository()
-			if err != nil {
-				log.Error(err.Error())
-				w.sendMsg(w.iConfig.GetConfigId(), err.Error())
-			}
-			err = rep.SetHis(hisData)
-			if err != nil {
-				log.Error(err.Error())
-				w.sendMsg(w.iConfig.GetConfigId(), err.Error())
-			}
-		}
-	}()
 	if msg == "" {
 		return
 	}
 	w.sendMsg(w.iConfig.GetConfigId(), msg)
+
+	err := w.saveHis(hisData)
+	if err != nil {
+		log.Error(err.Error())
+		w.sendMsg(w.iConfig.GetConfigId(), err.Error())
+	}
+
+	err = w.checkAction(w.iConfig.GetConfigId())
+	if err != nil {
+		log.Error(err.Error())
+		w.sendMsg(w.iConfig.GetConfigId(), err.Error())
+	}
 }
 
+//检查并执行相关操作
+func (w *worker) checkAction(id string) error {
+	actionListRepository := repository.ActionList{}
+	actionList, err := actionListRepository.GetActionList(id)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	var errMsg string
+	for _, s := range actionList.WindowsService {
+		err = w.checkActionWorker(s, global.AWindowsService)
+		if err != nil {
+			errMsg = errMsg + err.Error() + ";"
+		}
+	}
+
+	for _, s := range actionList.IISAppPool {
+		err = w.checkActionWorker(s, global.AIISAppPool)
+		if err != nil {
+			errMsg = errMsg + err.Error() + ";"
+		}
+	}
+	if errMsg != "" {
+		return errors.New(errMsg)
+	}
+	return nil
+}
+
+func (w *worker) checkActionWorker(id string, t global.ActionType) error {
+	rep, err := repository.NewActionRepository(t)
+	if err != nil {
+		return err
+	}
+	actionData, err := rep.GetAction(id)
+	if err != nil {
+		return err
+	}
+	ac, err := action.NewAction(actionData)
+	if err != nil {
+		return err
+	}
+	return ac.Do()
+}
+
+//保存查询数据
+func (w *worker) saveHis(hisData object.IHisData) error {
+	if hisData != nil {
+		rep, err := w.iWorker.getHisRepository()
+		if err != nil {
+			return err
+		}
+		err = rep.SetHis(hisData)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+//发送消息
 func (w *worker) sendMsg(configId, msg string) {
 	list, err := w.getNotifyList(w.iConfig.GetConfigId())
 	if err != nil {
@@ -83,14 +143,6 @@ func (w *worker) sendMsg(configId, msg string) {
 		log.Warn(fmt.Sprintf("消息未发送：%s", msg))
 	}
 }
-
-//func (w *worker) saveSearchResult(data object.IHisData) error {
-//	rep,err := repository.NewHisRepository(global.HCrmDzXfTest)
-//	if err != nil {
-//		return err
-//	}
-//	return rep.SetHis(data)
-//}
 
 func (w *worker) getNotifyList(id string) ([]notify.INotify, error) {
 	nl := repository.NotifyList{}
