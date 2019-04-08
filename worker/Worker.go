@@ -45,16 +45,17 @@ func getWorker(iConfig object.IConfigData) (IWorker, error) {
 
 func (w *worker) Run() {
 	msg, hisData := w.iWorker.GetMsg()
-	if msg == "" {
-		return
-	}
-	w.sendMsg(w.iConfig.GetConfigId(), msg)
 
 	err := w.saveHis(hisData)
 	if err != nil {
 		log.Error(err.Error())
 		w.sendMsg(w.iConfig.GetConfigId(), err.Error())
 	}
+
+	if msg == "" {
+		return
+	}
+	w.sendMsg(w.iConfig.GetConfigId(), msg)
 
 	err = w.checkAction(w.iConfig.GetConfigId())
 	if err != nil {
