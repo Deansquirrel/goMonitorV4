@@ -52,6 +52,10 @@ func NewTask(configType global.ConfigType) (*task, error) {
 }
 
 func (t *task) StartTask() error {
+	//==================================================
+	t.clearCache()
+	t.startRegularRefresh()
+	//==================================================
 	var rep repository.IConfigRepository
 	rep, err := repository.NewConfigRepository(t.cType)
 	if err != nil {
@@ -62,9 +66,6 @@ func (t *task) StartTask() error {
 	if err != nil {
 		return err
 	}
-	t.clearCache()
-
-	t.startRegularRefresh()
 
 	errMsg := ""
 	errMsgFormat := "添加任务[%s]报错：%s；"
