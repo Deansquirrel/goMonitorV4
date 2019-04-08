@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+import log "github.com/Deansquirrel/goToolLog"
+
 type action struct {
 	iConfig object.IActionData
 	iAction IAction
@@ -34,12 +36,26 @@ func getAction(iConfig object.IActionData) (IAction, error) {
 }
 
 func (ac *action) Do() error {
-	b, err := ac.iAction.CheckTimes()
+	b, err := ac.iAction.CheckAction()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	if !b {
+		return ac.setHIsData("check action false")
+	}
+	hisData, err := ac.iAction.Do()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	return ac.setHIsData(hisData)
+}
+
+func (ac *action) setHIsData(data object.IHisData) error {
+	rep, err := ac.iAction.GetHisRepository()
 	if err != nil {
 		return err
 	}
-	if b {
-		return ac.iAction.Do()
-	}
-	return nil
+	return rep.SetHis(data)
 }

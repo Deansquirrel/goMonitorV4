@@ -1,5 +1,5 @@
 package notify
 
-type INotify interface {
+type iNotify interface {
 	SendMsg(msg string) error
 }

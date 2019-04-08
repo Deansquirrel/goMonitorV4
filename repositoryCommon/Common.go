@@ -1,4 +1,4 @@
-package repository
+package repositoryCommon
 
 import (
 	"database/sql"
@@ -7,11 +7,11 @@ import (
 	"github.com/Deansquirrel/goToolMSSql"
 )
 
-type common struct {
+type Common struct {
 }
 
 //获取配置库连接配置
-func (c *common) getConfigDBConfig() *goToolMSSql.MSSqlConfig {
+func (c *Common) getConfigDBConfig() *goToolMSSql.MSSqlConfig {
 	return &goToolMSSql.MSSqlConfig{
 		Server: global.SysConfig.ConfigDBConfig.Server,
 		Port:   global.SysConfig.ConfigDBConfig.Port,
@@ -21,7 +21,7 @@ func (c *common) getConfigDBConfig() *goToolMSSql.MSSqlConfig {
 	}
 }
 
-func (c *common) getRowsBySQL(sql string, args ...interface{}) (*sql.Rows, error) {
+func (c *Common) GetRowsBySQL(sql string, args ...interface{}) (*sql.Rows, error) {
 	conn, err := goToolMSSql.GetConn(c.getConfigDBConfig())
 	if err != nil {
 		log.Error(err.Error())
@@ -44,7 +44,7 @@ func (c *common) getRowsBySQL(sql string, args ...interface{}) (*sql.Rows, error
 	}
 }
 
-func (c *common) setRowsBySQL(sql string, args ...interface{}) error {
+func (c *Common) SetRowsBySQL(sql string, args ...interface{}) error {
 	conn, err := goToolMSSql.GetConn(c.getConfigDBConfig())
 	if err != nil {
 		log.Error(err.Error())

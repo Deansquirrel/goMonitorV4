@@ -2,7 +2,6 @@ package worker
 
 import (
 	"errors"
-	"fmt"
 	"github.com/Deansquirrel/goMonitorV4/action"
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/notify"
@@ -124,70 +123,9 @@ func (w *worker) saveHis(hisData object.IHisData) error {
 	return nil
 }
 
-//发送消息
-func (w *worker) sendMsg(configId, msg string) {
-	list, err := w.getNotifyList(w.iConfig.GetConfigId())
+func (w *worker) sendMsg(id string, msg string) {
+	err := notify.SendMsg(id, msg)
 	if err != nil {
-		log.Error(fmt.Sprintf("获取通知列表时发生错误:%s，消息未发送：%s", err.Error(), msg))
-		return
+		log.Error(err.Error())
 	}
-	sendFlag := false
-	for _, n := range list {
-		err = n.SendMsg(msg)
-		if err != nil {
-			log.Error(fmt.Sprintf("发送消息时遇到错误:%s，消息未发送：%s", err.Error(), msg))
-		} else {
-			sendFlag = true
-		}
-	}
-	if !sendFlag {
-		log.Warn(fmt.Sprintf("消息未发送：%s", msg))
-	}
-}
-
-func (w *worker) getNotifyList(id string) ([]notify.INotify, error) {
-	nl := repository.NotifyList{}
-	d, err := nl.GetNotifyList(id)
-	if err != nil {
-		errMsg := fmt.Sprintf("获取通知配置时发生错误：%s", err.Error())
-		log.Error(errMsg)
-		return nil, errors.New(errMsg)
-	}
-
-	result := make([]notify.INotify, 0)
-
-	errMsg := ""
-
-	//获取DingTalkRobot类型配置数据
-	dingTalkRep, err := repository.NewNotifyRepository(global.NDingTalkRobot)
-	if err != nil {
-		return nil, err
-	}
-	for _, id := range d.DingTalkRobot {
-		n, err := dingTalkRep.GetNotify(id)
-		if err != nil {
-			errMsg = w.updateNotifyErr(errMsg, err)
-		} else {
-			dt, err := notify.NewNotify(n.(*object.DingTalkRobotNotifyData))
-			if err != nil {
-				errMsg = w.updateNotifyErr(errMsg, err)
-			}
-			result = append(result, dt)
-		}
-	}
-
-	if errMsg != "" {
-		err = errors.New(errMsg)
-	} else {
-		err = nil
-	}
-
-	return result, err
-}
-
-func (w *worker) updateNotifyErr(old string, err error) string {
-	errMsgFormat := "获取[%s]NotifyData时发生错误：%s；"
-	m := fmt.Sprintf(errMsgFormat, "DingTalkRobot", err.Error())
-	log.Error(m)
-	return old + m
 }

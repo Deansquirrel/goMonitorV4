@@ -36,35 +36,35 @@ func (cs *cronService) Start() {
 		}
 	}()
 
-	intTask, err := taskService.NewTask(global.CInt)
-	if err != nil {
-		log.Error(err.Error())
-	} else {
-		err = intTask.StartTask()
-		if err != nil {
-			log.Error(err.Error())
-		}
-	}
+	//intTask, err := taskService.NewTask(global.CInt)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//} else {
+	//	err = intTask.StartTask()
+	//	if err != nil {
+	//		log.Error(err.Error())
+	//	}
+	//}
 
-	crmDzXfTestTask, err := taskService.NewTask(global.CCrmDzXfTest)
-	if err != nil {
-		log.Error(err.Error())
-	} else {
-		err = crmDzXfTestTask.StartTask()
-		if err != nil {
-			log.Error(err.Error())
-		}
-	}
+	//crmDzXfTestTask, err := taskService.NewTask(global.CCrmDzXfTest)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//} else {
+	//	err = crmDzXfTestTask.StartTask()
+	//	if err != nil {
+	//		log.Error(err.Error())
+	//	}
+	//}
 
-	healthTask, err := taskService.NewTask(global.CHealth)
-	if err != nil {
-		log.Error(err.Error())
-	} else {
-		err = healthTask.StartTask()
-		if err != nil {
-			log.Error(err.Error())
-		}
-	}
+	//healthTask, err := taskService.NewTask(global.CHealth)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//} else {
+	//	err = healthTask.StartTask()
+	//	if err != nil {
+	//		log.Error(err.Error())
+	//	}
+	//}
 
 	webState, err := taskService.NewTask(global.CWebState)
 	if err != nil {
