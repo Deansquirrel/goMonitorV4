@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/configHis"
 	"github.com/Deansquirrel/goToolCommon"
 	log "github.com/Deansquirrel/goToolLog"
 	"net/http"
@@ -45,8 +45,8 @@ func (wsw *webStateWorker) GetMsg() (string, object.IHisData) {
 
 //SaveSearchResult(data object.IHisData) error
 
-func (wsw *webStateWorker) getHisRepository() (repository.IHisRepository, error) {
-	return repository.NewHisRepository(global.HWebState)
+func (wsw *webStateWorker) getHisRepository() (configHis.IHisRepository, error) {
+	return configHis.NewHisRepository(global.HWebState)
 }
 
 func (wsw *webStateWorker) getWebStateTestData() (useTime, httpCode int, err error) {

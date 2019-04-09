@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/config"
+	"github.com/Deansquirrel/goMonitorV4/repository/configHis"
 	"github.com/Deansquirrel/goToolCommon"
 	log "github.com/Deansquirrel/goToolLog"
 	"github.com/Deansquirrel/goToolMSSql"
@@ -68,7 +69,7 @@ func (iw *intWorker) formatMsg(msg string) string {
 }
 
 func (iw *intWorker) getDMsg() string {
-	rep, err := repository.NewConfigRepository(global.CIntD)
+	rep, err := config.NewConfigRepository(global.CIntD)
 	if err != nil {
 		log.Error(fmt.Sprintf(err.Error()))
 		return ""
@@ -147,8 +148,8 @@ func (iw *intWorker) getSingleDMsg(search string) string {
 	return result
 }
 
-func (iw *intWorker) getHisRepository() (repository.IHisRepository, error) {
-	return repository.NewHisRepository(global.HInt)
+func (iw *intWorker) getHisRepository() (configHis.IHisRepository, error) {
+	return configHis.NewHisRepository(global.HInt)
 }
 
 //

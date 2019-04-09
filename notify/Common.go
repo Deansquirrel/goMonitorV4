@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/notify"
 	"reflect"
 )
 
@@ -60,7 +60,7 @@ func (c *common) NewNotify(configData object.INotifyData) (iNotify, error) {
 }
 
 func (c *common) GetNotifyList(id string) ([]iNotify, error) {
-	nl := repository.NotifyList{}
+	nl := notify.NewNotifyList()
 	d, err := nl.GetNotifyList(id)
 	if err != nil {
 		errMsg := fmt.Sprintf("获取通知配置时发生错误：%s", err.Error())
@@ -73,7 +73,7 @@ func (c *common) GetNotifyList(id string) ([]iNotify, error) {
 	errMsg := ""
 
 	//获取DingTalkRobot类型配置数据
-	dingTalkRep, err := repository.NewNotifyRepository(global.NDingTalkRobot)
+	dingTalkRep, err := notify.NewNotifyRepository(global.NDingTalkRobot)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,7 @@ package worker
 
 import (
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/configHis"
 	"github.com/Deansquirrel/goToolCommon"
 	"github.com/Deansquirrel/goToolEnvironment"
 	log "github.com/Deansquirrel/goToolLog"
@@ -24,7 +24,7 @@ func (hw *healthWorker) GetMsg() (string, object.IHisData) {
 	return hw.formatMsg(msg), nil
 }
 
-func (hw *healthWorker) getHisRepository() (repository.IHisRepository, error) {
+func (hw *healthWorker) getHisRepository() (configHis.IHisRepository, error) {
 	return nil, nil
 }
 

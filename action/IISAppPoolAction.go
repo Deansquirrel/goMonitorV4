@@ -2,7 +2,7 @@ package action
 
 import (
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/configHis"
 	"github.com/Deansquirrel/goToolCommon"
 	"strings"
 	"time"
@@ -16,6 +16,7 @@ func (ia *iisAppPoolAction) Do() (object.IHisData, error) {
 	//TODO
 	return nil, nil
 }
+
 func (ia *iisAppPoolAction) GetHisData(msg string) object.IHisData {
 	return object.IISAppPoolActionHisData{
 		FId:            strings.ToUpper(goToolCommon.Guid()),
@@ -31,7 +32,7 @@ func (ia *iisAppPoolAction) CheckAction() (bool, error) {
 	//TODO
 	return false, nil
 }
-func (ia *iisAppPoolAction) GetHisRepository() (repository.IHisRepository, error) {
+func (ia *iisAppPoolAction) GetHisRepository() (configHis.IHisRepository, error) {
 	//TODO
 	return nil, nil
 }

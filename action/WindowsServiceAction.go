@@ -2,7 +2,7 @@ package action
 
 import (
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/configHis"
 )
 
 type windowsServiceAction struct {
@@ -21,7 +21,7 @@ func (ws *windowsServiceAction) CheckAction() (bool, error) {
 	//TODO
 	return false, nil
 }
-func (ws *windowsServiceAction) GetHisRepository() (repository.IHisRepository, error) {
+func (ws *windowsServiceAction) GetHisRepository() (configHis.IHisRepository, error) {
 	//TODO
 	return nil, nil
 }

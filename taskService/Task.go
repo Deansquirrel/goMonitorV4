@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	"github.com/Deansquirrel/goMonitorV4/repository/config"
+	"github.com/Deansquirrel/goMonitorV4/repository/configHis"
 	"github.com/Deansquirrel/goMonitorV4/worker"
 	"github.com/Deansquirrel/goToolCommon"
 	log "github.com/Deansquirrel/goToolLog"
@@ -56,8 +57,8 @@ func (t *task) StartTask() error {
 	t.clearCache()
 	t.startRegularRefresh()
 	//==================================================
-	var rep repository.IConfigRepository
-	rep, err := repository.NewConfigRepository(t.cType)
+	var rep config.IConfigRepository
+	rep, err := config.NewConfigRepository(t.cType)
 	if err != nil {
 		return err
 	}
@@ -69,10 +70,10 @@ func (t *task) StartTask() error {
 
 	errMsg := ""
 	errMsgFormat := "添加任务[%s]报错：%s；"
-	for _, config := range list {
-		err = t.addJob(config)
+	for _, taskConfig := range list {
+		err = t.addJob(taskConfig)
 		if err != nil {
-			errMsg = errMsg + fmt.Sprintf(errMsgFormat, config.GetConfigId(), err.Error())
+			errMsg = errMsg + fmt.Sprintf(errMsgFormat, taskConfig.GetConfigId(), err.Error())
 		}
 	}
 	if errMsg != "" {
@@ -187,7 +188,7 @@ func (t *task) refreshConfig() {
 //删除历史数据
 func (t *task) delHisData() {
 	d := time.Duration(1000 * 1000 * 1000 * 60 * 60 * 24 * global.SysConfig.TaskConfig.KeepDays)
-	rep, err := repository.NewHisRepository(t.hType)
+	rep, err := configHis.NewHisRepository(t.hType)
 	if err != nil {
 		log.Error(err.Error())
 		return
@@ -199,8 +200,8 @@ func (t *task) delHisData() {
 }
 
 func (t *task) refreshConfigWorker() error {
-	var rep repository.IConfigRepository
-	rep, err := repository.NewConfigRepository(t.cType)
+	var rep config.IConfigRepository
+	rep, err := config.NewConfigRepository(t.cType)
 	if err != nil {
 		return err
 	}
@@ -212,12 +213,12 @@ func (t *task) refreshConfigWorker() error {
 	idList := make([]string, 0)
 	idMap := make(map[string]object.IConfigData, 0)
 	for _, iConfig := range list {
-		config, ok := iConfig.(object.IConfigData)
+		taskConfig, ok := iConfig.(object.IConfigData)
 		if !ok {
 			return errors.New("不是有效的IConfigData")
 		}
-		idList = append(idList, config.GetConfigId())
-		idMap[config.GetConfigId()] = config
+		idList = append(idList, taskConfig.GetConfigId())
+		idMap[taskConfig.GetConfigId()] = taskConfig
 	}
 
 	addList, delList, checkList := goToolCommon.CheckDiff(idList, t.iTask.getCacheIdList())

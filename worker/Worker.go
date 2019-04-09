@@ -6,7 +6,7 @@ import (
 	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/notify"
 	"github.com/Deansquirrel/goMonitorV4/object"
-	"github.com/Deansquirrel/goMonitorV4/repository"
+	repAction "github.com/Deansquirrel/goMonitorV4/repository/action"
 	log "github.com/Deansquirrel/goToolLog"
 	"reflect"
 )
@@ -65,7 +65,7 @@ func (w *worker) Run() {
 
 //检查并执行相关操作
 func (w *worker) checkAction(id string) error {
-	actionListRepository := repository.ActionList{}
+	actionListRepository := repAction.NewActionList()
 	actionList, err := actionListRepository.GetActionList(id)
 	if err != nil {
 		log.Error(err.Error())
@@ -93,10 +93,11 @@ func (w *worker) checkAction(id string) error {
 }
 
 func (w *worker) checkActionWorker(id string, t global.ActionType) error {
-	rep, err := repository.NewActionRepository(t)
+	rep, err := repAction.NewActionRepository(t)
 	if err != nil {
 		return err
 	}
+
 	actionData, err := rep.GetAction(id)
 	if err != nil {
 		return err
