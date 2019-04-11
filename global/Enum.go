@@ -17,10 +17,10 @@ const (
 	NDingTalkRobot NotifyType = iota
 )
 
-type HisType int
+type ConfigHisType int
 
 const (
-	HInt HisType = iota
+	HInt ConfigHisType = iota
 	HWebState
 	HCrmDzXfTest
 )
@@ -30,4 +30,11 @@ type ActionType int
 const (
 	AWindowsService ActionType = iota
 	AIISAppPool
+)
+
+type ActionHisType int
+
+const (
+	HWindowsService ActionHisType = iota
+	HIISAppPool
 )

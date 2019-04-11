@@ -13,7 +13,7 @@ type action struct {
 	iAction IAction
 }
 
-func NewAction(iConfig object.IActionData) (*action, error) {
+func newAction(iConfig object.IActionData) (*action, error) {
 	ac, err := getAction(iConfig)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,12 @@ func (ac *action) Do() error {
 		log.Error(err.Error())
 		return err
 	}
-	return ac.setHIsData(hisData)
+	err = ac.setHIsData(hisData)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	return nil
 }
 
 func (ac *action) setHIsData(data object.IHisData) error {

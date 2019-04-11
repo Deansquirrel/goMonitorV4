@@ -3,10 +3,8 @@ package worker
 import (
 	"errors"
 	"github.com/Deansquirrel/goMonitorV4/action"
-	"github.com/Deansquirrel/goMonitorV4/global"
 	"github.com/Deansquirrel/goMonitorV4/notify"
 	"github.com/Deansquirrel/goMonitorV4/object"
-	repAction "github.com/Deansquirrel/goMonitorV4/repository/action"
 	log "github.com/Deansquirrel/goToolLog"
 	"reflect"
 )
@@ -56,57 +54,11 @@ func (w *worker) Run() {
 	}
 	w.sendMsg(w.iConfig.GetConfigId(), msg)
 
-	err = w.checkAction(w.iConfig.GetConfigId())
+	err = action.CheckAction(w.iConfig.GetConfigId())
 	if err != nil {
 		log.Error(err.Error())
-		w.sendMsg(w.iConfig.GetConfigId(), err.Error())
+		w.sendMsg(w.iConfig.GetConfigId(), "Check Action Error: "+err.Error())
 	}
-}
-
-//检查并执行相关操作
-func (w *worker) checkAction(id string) error {
-	actionListRepository := repAction.NewActionList()
-	actionList, err := actionListRepository.GetActionList(id)
-	if err != nil {
-		log.Error(err.Error())
-		return err
-	}
-
-	var errMsg string
-	for _, s := range actionList.WindowsService {
-		err = w.checkActionWorker(s, global.AWindowsService)
-		if err != nil {
-			errMsg = errMsg + err.Error() + ";"
-		}
-	}
-
-	for _, s := range actionList.IISAppPool {
-		err = w.checkActionWorker(s, global.AIISAppPool)
-		if err != nil {
-			errMsg = errMsg + err.Error() + ";"
-		}
-	}
-	if errMsg != "" {
-		return errors.New(errMsg)
-	}
-	return nil
-}
-
-func (w *worker) checkActionWorker(id string, t global.ActionType) error {
-	rep, err := repAction.NewActionRepository(t)
-	if err != nil {
-		return err
-	}
-
-	actionData, err := rep.GetAction(id)
-	if err != nil {
-		return err
-	}
-	ac, err := action.NewAction(actionData)
-	if err != nil {
-		return err
-	}
-	return ac.Do()
 }
 
 //保存查询数据

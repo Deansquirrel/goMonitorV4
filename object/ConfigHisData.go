@@ -27,15 +27,3 @@ type WebStateHisData struct {
 	FContent  string
 	FOprTime  time.Time
 }
-
-//====================================================
-
-type IISAppPoolActionHisData struct {
-	FId            string
-	FConfigId      string
-	FAgentServerId string
-	FName          string
-	FCheckTimes    int
-	FContent       string
-	FOprTime       time.Time
-}
